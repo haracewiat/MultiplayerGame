@@ -5,11 +5,12 @@ from player import Player
 
 class Game:
 
-    def __init__(self, w, h):
+    def __init__(self, players):
+        self.players = players
         self.net = Network()
-        self.width = w
-        self.height = h
-        self.player = Player(50, 50)
+        self.width = 800
+        self.height = 800
+        self.player = Player(300, 300)
         self.player2 = Player(100, 100)
         self.canvas = Canvas(self.width, self.height, "Testing...")
 
