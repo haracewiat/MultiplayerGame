@@ -43,6 +43,7 @@ class Server:
     def accept_connection(self):
         self.GAME_STATE.update([Player(50, 50), Player(150, 150)])
         connection, address = self.sock.accept()
+        print(self.GAME_STATE)
         connection.send(pickle.dumps(self.GAME_STATE))
 
     def receive(self, connection):

@@ -1,101 +1,53 @@
 import pygame
-from network import Network
-# from client import Client
 from player import Player
+
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
 
 
 class Game:
 
     def __init__(self):
-        self.net = Network()
-        self.width = 600
-        self.height = 600
-        self.player = Player(50, 50)
-        self.player2 = Player(100, 100)
-        self.canvas = Canvas(self.width, self.height, "Testing...")
 
-    def run(self):
+        # Set the width and height of the screen [width, height]
+        size = (700, 500)
+        screen = pygame.display.set_mode(size)
+
+        pygame.display.set_caption("My Game")
+
+        # Loop until the user clicks the close button.
+        done = False
+
+        # Used to manage how fast the screen updates
         clock = pygame.time.Clock()
-        run = True
-        while run:
-            clock.tick(60)
 
+        # -------- Main Program Loop -----------
+        while not done:
+            # --- Main event loop
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    run = False
+                    done = True
 
-                if event.type == pygame.K_ESCAPE:
-                    run = False
+            # --- Game logic should go here
 
-            keys = pygame.key.get_pressed()
+            # --- Screen-clearing code goes here
 
-            if keys[pygame.K_RIGHT]:
-                if self.player.x <= self.width - self.player.velocity:
-                    self.player.move(0)
+            # Here, we clear the screen to white. Don't put other drawing commands
+            # above this, or they will be erased with this command.
 
-            if keys[pygame.K_LEFT]:
-                if self.player.x >= self.player.velocity:
-                    self.player.move(1)
+            # If you want a background image, replace this clear with blit'ing the
+            # background image.
+            screen.fill(WHITE)
 
-            if keys[pygame.K_UP]:
-                if self.player.y >= self.player.velocity:
-                    self.player.move(2)
+            # --- Drawing code should go here
 
-            if keys[pygame.K_DOWN]:
-                if self.player.y <= self.height - self.player.velocity:
-                    self.player.move(3)
+            # --- Go ahead and update the screen with what we've drawn.
+            pygame.display.flip()
 
-            # Send Network Stuff
-            self.player2.x, self.player2.y = self.parse_data(self.send_data())
+            # --- Limit to 60 frames per second
+            clock.tick(60)
 
-            # Update Canvas
-            self.canvas.draw_background()
-            self.player.draw(self.canvas.get_canvas())
-            self.player2.draw(self.canvas.get_canvas())
-            self.canvas.update()
-
+        # Close the window and quit.
         pygame.quit()
-
-    def send_data(self):
-        """
-        Send position to server
-        :return: None
-        """
-        data = str(self.net.id) + ":" + str(self.player.x) + \
-            "," + str(self.player.y)
-        reply = self.net.send(data)
-        return reply
-
-    @staticmethod
-    def parse_data(data):
-        try:
-            d = data.split(":")[1].split(",")
-            return int(d[0]), int(d[1])
-        except:
-            return 0, 0
-
-
-class Canvas:
-
-    def __init__(self, w, h, name="None"):
-        self.width = w
-        self.height = h
-        self.screen = pygame.display.set_mode((w, h))
-        pygame.display.set_caption(name)
-
-    @staticmethod
-    def update():
-        pygame.display.update()
-
-    def draw_text(self, text, size, x, y):
-        pygame.font.init()
-        font = pygame.font.SysFont("comicsans", size)
-        render = font.render(text, 1, (0, 0, 0))
-
-        self.screen.draw(render, (x, y))
-
-    def get_canvas(self):
-        return self.screen
-
-    def draw_background(self):
-        self.screen.fill((255, 255, 255))
