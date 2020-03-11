@@ -1,7 +1,7 @@
 import socket
 import threading
 import sys
-import game
+from game import Game
 
 HOST = '145.108.231.158'  # '18.195.107.195'
 PORT = 5378

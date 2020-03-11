@@ -1,13 +1,14 @@
 import pygame
-from client import *
-from player import *
+from client import Client
+from player import Player
 
 
 class Game:
 
-    def __init__(self, players):
-        self.players = players
-        self.net = Client()
+    def __init__(self):
+        print("created")
+        #self.players = players
+        #self.net = Client()
         self.width = 800
         self.height = 800
         self.player = Player(300, 300)
