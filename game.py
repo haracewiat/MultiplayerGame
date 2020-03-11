@@ -1,14 +1,15 @@
 import pygame
 from network import Network
+# from client import Client
 from player import Player
 
 
 class Game:
 
-    def __init__(self, w, h):
+    def __init__(self):
         self.net = Network()
-        self.width = w
-        self.height = h
+        self.width = 600
+        self.height = 600
         self.player = Player(50, 50)
         self.player2 = Player(100, 100)
         self.canvas = Canvas(self.width, self.height, "Testing...")
