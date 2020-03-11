@@ -1,9 +1,9 @@
 import socket
 import threading
 import sys
-from game import Game
+import game
 
-HOST = '10.4.1.97'  # '18.195.107.195'
+HOST = '145.108.231.158'  # '18.195.107.195'
 PORT = 5378
 BUFFER = 4096
 

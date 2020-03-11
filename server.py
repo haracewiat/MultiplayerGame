@@ -4,7 +4,7 @@ import sys
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-HOST = '10.4.1.97'
+HOST = '145.108.231.158'
 PORT = 5378
 NO_CONNECTIONS = 64
 BUFFER = 4096

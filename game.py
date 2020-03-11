@@ -1,13 +1,13 @@
 import pygame
-from network import Network
-from player import Player
+from client import *
+from player import *
 
 
 class Game:
 
     def __init__(self, players):
         self.players = players
-        self.net = Network()
+        self.net = Client()
         self.width = 800
         self.height = 800
         self.player = Player(300, 300)
