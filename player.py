@@ -4,9 +4,9 @@ import pygame
 class Player():
     width = height = 50
 
-    def __init__(self, startx, starty, color=(84, 165, 236)):
-        self.x = startx
-        self.y = starty
+    def __init__(self, x, y, color=(84, 165, 236)):
+        self.x = x
+        self.y = y
         self.velocity = 4
         self.color = color
 

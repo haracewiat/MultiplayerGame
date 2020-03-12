@@ -56,7 +56,9 @@ class Server:
             else:
                 print("received                                             OK")
                 self.GAME_STATE = pickle.loads(data)
-                connection.send(pickle.dumps(self.GAME_STATE))
+
+                print("sending...")
+                connection.sendall(pickle.dumps(self.GAME_STATE))
                 # self.broadcast()
 
     def broadcast(self):

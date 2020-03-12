@@ -17,6 +17,7 @@ class Client:
         self.connect()
 
     def receive(self):
+
         print("receiving...")
 
         data = self.sock.recv(BUFFER)
