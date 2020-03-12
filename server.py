@@ -41,18 +41,28 @@ class Server:
         self.sock.close()
 
     def accept_connection(self):
-        self.GAME_STATE.update([Player(50, 50), Player(150, 150)])
+        print("accepting...")
         connection, address = self.sock.accept()
-        print(self.GAME_STATE)
+        self.CONNECTIONS[len(self.CONNECTIONS)] = connection
         connection.send(pickle.dumps(self.GAME_STATE))
 
     def receive(self, connection):
+        print("receiving...")
         while True:
             data = connection.recv(BUFFER)
 
             if not data:
-                self.disconnect(connection)
-                return
+                break
+            else:
+                print("received                                             OK")
+                self.GAME_STATE = pickle.loads(data)
+                connection.send(pickle.dumps(self.GAME_STATE))
+                # self.broadcast()
+
+    def broadcast(self):
+        print("broadcasting...")
+        # for connection in self.CONNECTIONS.values:
+        #    connection.sendall(pickle.dumps(self.GAME_STATE))
 
     def disconnect(self, connection):
         if self.get_value(connection) is not None:

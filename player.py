@@ -22,3 +22,6 @@ class Player():
             self.y -= self.velocity
         else:
             self.y += self.velocity
+
+    def print(self):
+        print(self.y)

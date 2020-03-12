@@ -8,10 +8,17 @@ class GameStateDTO:
     PLAYERS = List[Player]
 
     def __init__(self):
-        print("Created a new game state.")
+        self.PLAYERS = [Player(50, 50), Player(150, 150)]
 
-    def update(self, players: List[Player]):
-        self.PLAYERS = players
+    def update(self, state):
+        self.PLAYERS = state
+
+    def addPlayer(self, player: Player):
+        # self.PLAYERS.append(player)
+        self.PLAYERS = [player]
 
     def getPlayers(self):
         return self.PLAYERS
+
+    def test(self):
+        print(self)
