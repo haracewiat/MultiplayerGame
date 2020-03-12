@@ -41,10 +41,8 @@ class Game:
             self.screen.fill(WHITE)
 
             # FIXME case for an empty list
-            # print(self.GAME_STATE.getPlayers())
-            if self.GAME_STATE.getPlayers() is not None:
-                for player in self.GAME_STATE.getPlayers():
-                    player.draw(self.screen)
+            for player in self.GAME_STATE.getPlayers():
+                player.draw(self.screen)
 
             # Player movement
             self.movePlayer(pygame.key.get_pressed(), player)
@@ -57,16 +55,18 @@ class Game:
     def watchGameState(self):
         while True:
             self.GAME_STATE.update(self.connection.receive())
+            print(self.GAME_STATE.test())
 
     def spawnPlayer(self):
-        player = Player(450, 450)
-        self.connection.send(GameStateDTO().addPlayer(player))
+        player = Player(250, 150)
+        self.GAME_STATE.addPlayer(player)
+        self.connection.send(self.GAME_STATE)
         return player
 
     def movePlayer(self, keys, player):
         if keys[pygame.K_RIGHT]:
-            self.connection.send(self.GAME_STATE.addPlayer(
-                Player(player.x + 4, player.y + 6)))
+            self.connection.send(self.GAME_STATE.updatePlayer(
+                player, player.x + 1, player.y + 1))
 
 
 game = Game()

@@ -3,6 +3,7 @@ import threading
 import sys
 import pickle
 from game_state import GameStateDTO
+from player import Player
 
 HOST = '127.0.0.1'
 PORT = 5378
@@ -14,17 +15,18 @@ class Client:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def __init__(self):
+        print(self.sock)
         self.connect()
 
     def receive(self):
+        while True:
+            print("receiving...")
 
-        print("receiving...")
+            data = self.sock.recv(BUFFER)
 
-        data = self.sock.recv(BUFFER)
-
-        if data:
-            print("received                                             OK")
-            return pickle.loads(data)
+            if data:
+                print("received                                             OK")
+                return pickle.loads(data)
 
     def send(self, GameState: GameStateDTO):
         print("sending")

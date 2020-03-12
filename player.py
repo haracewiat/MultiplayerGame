@@ -2,7 +2,7 @@ import pygame
 
 
 class Player():
-    width = height = 50
+    width = height = 20
 
     def __init__(self, x, y, color=(84, 165, 236)):
         self.x = x

@@ -5,22 +5,21 @@ from typing import List
 
 class GameStateDTO:
 
-    PLAYERS = List[Player]
+    PLAYERS = []
 
     def update(self, state):
-        self.PLAYERS = state
+        self = state
 
     def addPlayer(self, player: Player):
-        # self.PLAYERS.append(player)
-        self.PLAYERS = [player]
+        self.PLAYERS.append(player)
 
     def updatePlayer(self, player, x, y):
-        print(self.PLAYERS)
+        self.PLAYERS.remove(player)
+        self.addPlayer(Player(x, y))
 
     def getPlayers(self):
         return self.PLAYERS
 
     def test(self):
-        if self.PLAYERS is not None:
-            print(self.PLAYERS)
-        #print("X: " + self.PLAYERS[2].x + ", Y: " + self.PLAYERS[2].y)
+        for player in self.PLAYERS:
+            print("X: " + str(player.x) + ", Y: " + str(player.y))
