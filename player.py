@@ -1,24 +1,23 @@
-import pygame
+class Player:
 
+    global playerVelocity
+    global playerScore
 
-class Player():
-    width = height = 50
+    def __init__(self, x, y, colour, id):
+        self.id = id
+        self.x = x
+        self.y = y
+        self.playerVelocity = 9
+        self.playerScore = 0
+        self.colour = colour
 
-    def __init__(self, startx, starty, color=(84, 165, 236)):
-        self.x = startx
-        self.y = starty
-        self.velocity = 4
-        self.color = color
+    def increaseVelocity(self, newvelocity):
+        playerVelocity += newvelocity
+        return playerVelocity
 
-    def draw(self, g):
-        pygame.draw.circle(g, self.color, (self.x, self.y), self.width)
+    def increasePlayerScore(self, newScore):
+        playerScore += newScore
+        return playerScore
 
-    def move(self, key):
-        if key == 0:
-            self.x += self.velocity
-        elif key == 1:
-            self.x -= self.velocity
-        elif key == 2:
-            self.y -= self.velocity
-        else:
-            self.y += self.velocity
+    def getVelocity(self):
+        return playerVelocity

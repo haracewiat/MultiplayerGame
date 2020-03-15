@@ -1,65 +1,48 @@
 import socket
+import pickle as pickle
 import threading
-import sys
-from game import Game
 
-HOST = '145.108.231.158'  # '18.195.107.195'
-PORT = 5378
-BUFFER = 4096
-
+BUFFER = 4096*4
 
 class Client:
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    global data_buffer
 
     def __init__(self):
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.host = "127.0.0.1"
+        self.port = 5555
+        self.addr = (self.host, self.port)
 
-        # Connect to the host
-        self.connect()
+    def connect(self):
+        self.client.connect(self.addr)
 
-        # Send and receive messages
+    def disconnect(self):
+        self.client.close()
+
+    def start_receiving_thread(self):
         thread_receive = threading.Thread(target=self.receive)
         thread_receive.start()
 
-        self.send()
-
-        # Disconnect
-        self.disconnect(thread_receive)
-
     def receive(self):
-
-        message = b''
-
         while True:
-            data = self.sock.recv(BUFFER)
+            data = self.client.recv(BUFFER)
+            try:
+                reply = pickle.loads(data)
+            except Exception as e:
+                print(e)
+            self.data_buffer = reply
 
-            if not data:
-                break
+    def get_data_buffer(self):
+        return self.data_buffer
 
-    def send(self):
-        while True:
-            self.sock.sendall(input())
+    def sendName(self, name):
+        self.client.send(str.encode(name))
+        val = self.client.recv(8)
+        return int(val.decode())
 
-    def connect(self):
+    def sendData(self, data):
         try:
-            self.sock.connect((HOST, PORT))
-        except:
-            print("Cannot establish connection. Aborting.")
-            sys.exit()
-
-        print("Connected to remote host.")
-
-    def reconnect(self):
-        print('Connection lost. Trying to reconnect...')
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connect()
-
-    def disconnect(self, thread):
-        self.sock.shutdown(1)
-        thread.join()
-        self.sock.close()
-        print("Disconnected.")
-        sys.exit()
-
-
-client = Client()
+            self.client.send(pickle.dumps(data))
+        except socket.error as e:
+            print(e)
