@@ -1,23 +1,20 @@
 class Player:
 
-    global playerVelocity
-    global playerScore
-
-    def __init__(self, x, y, colour, id):
-        self.id = id
+    def __init__(self, x, y, color, name):
+        self.name = name
         self.x = x
         self.y = y
         self.playerVelocity = 9
         self.playerScore = 0
-        self.colour = colour
+        self.color = color
 
     def increaseVelocity(self, newvelocity):
-        playerVelocity += newvelocity
-        return playerVelocity
+        self.playerVelocity += newvelocity
+        return self.playerVelocity
 
     def increasePlayerScore(self, newScore):
-        playerScore += newScore
-        return playerScore
+        self.playerScore += newScore
+        return self.playerScore
 
     def getVelocity(self):
-        return playerVelocity
+        return self.playerVelocity

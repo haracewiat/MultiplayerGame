@@ -1,48 +1,60 @@
 import socket
-import pickle as pickle
-import threading
+import _pickle as pickle
 
-BUFFER = 4096*4
 
-class Client:
+class Network:
+    """
+    class to connect, send and recieve information from the server
 
-    global data_buffer
-
+    need to hardcode the host attirbute to be the server's ip
+    """
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.client.settimeout(10.0)
         self.host = "127.0.0.1"
         self.port = 5555
         self.addr = (self.host, self.port)
 
-    def connect(self):
+    def connect(self, name):
+        """
+        connects to server and returns the id of the client that connected
+        :param name: str
+        :return: int reprsenting id
+        """
         self.client.connect(self.addr)
-
-    def disconnect(self):
-        self.client.close()
-
-    def start_receiving_thread(self):
-        thread_receive = threading.Thread(target=self.receive)
-        thread_receive.start()
-
-    def receive(self):
-        while True:
-            data = self.client.recv(BUFFER)
-            try:
-                reply = pickle.loads(data)
-            except Exception as e:
-                print(e)
-            self.data_buffer = reply
-
-    def get_data_buffer(self):
-        return self.data_buffer
-
-    def sendName(self, name):
         self.client.send(str.encode(name))
         val = self.client.recv(8)
-        return int(val.decode())
+        return int(val.decode()) # can be int because will be an int id
 
-    def sendData(self, data):
+    def disconnect(self):
+        """
+        disconnects from the server
+        :return: None
+        """
+        self.client.close()
+
+    def send(self, data, pick=False):
+        """
+        sends information to the server
+
+        :param data: str
+        :param pick: boolean if should pickle or not
+        :return: str
+        """
         try:
-            self.client.send(pickle.dumps(data))
+            if pick:
+                self.client.send(pickle.dumps(data))
+            else:
+                self.client.send(str.encode(data))
+            reply = self.client.recv(2048*4)
+            try:
+                reply = pickle.loads(reply)
+            except Exception as e:
+                print(e)
+
+            return reply
         except socket.error as e:
             print(e)
+
+
+
