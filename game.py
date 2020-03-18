@@ -26,6 +26,7 @@ SCORE_FONT = pygame.font.SysFont("comicsans", 26)
 # Dynamic Variables
 players = {}
 foods = []
+sequenceNumber = 0
 
 
 class Game:
@@ -61,9 +62,10 @@ class Game:
         global players
 
         # start by connecting to the network
-        server = Client()
-        current_id = server.connect(name)
-        foods, players, game_time = server.send("get")
+        client = Client()
+        current_id = client.connect(name)
+        client.send("get")
+        foods, players, game_time = client.receive()
 
         # setup the clock, limit to 30fps
         clock = pygame.time.Clock()
@@ -89,7 +91,8 @@ class Game:
                 str(player.playerScore) + " " + str(player.playerVelocity)
 
             # send data to server and recieve back all players information
-            foods, players, game_time = server.send(data)
+            client.send(data)
+            foods, players, game_time = client.receive()
 
             for event in pygame.event.get():
                 # if user hits red x button close window
@@ -105,12 +108,13 @@ class Game:
             self.redraw_window(players, foods, game_time, player.playerScore)
             pygame.display.update()
 
-        server.disconnect()
+        client.disconnect()
         pygame.quit()
         quit()
 
 
 # FUNCTIONS
+
 
     def movePlayer(self, player, keys, vel):
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:

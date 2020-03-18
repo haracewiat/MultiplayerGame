@@ -1,5 +1,6 @@
 import socket
 import _pickle as pickle
+#import threading
 
 HOST = '127.0.0.1'
 PORT = 5378
@@ -43,12 +44,13 @@ class Client:
                 self.sock.send(pickle.dumps(data))
             else:
                 self.sock.send(str.encode(data))
-            reply = self.sock.recv(2048*4)
-            try:
-                reply = pickle.loads(reply)
-            except Exception as e:
-                print(e)
-
-            return reply
         except socket.error as e:
             print(e)
+
+    def receive(self):
+        reply = self.sock.recv(2048 * 4)
+        try:
+            reply = pickle.loads(reply)
+        except Exception as e:
+            print(e)
+        return reply
