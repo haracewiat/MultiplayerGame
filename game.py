@@ -6,6 +6,8 @@ import random
 from client import Client
 import contextlib
 from constants import colors as COLORS
+from gameStateDTO import *
+
 
 with contextlib.redirect_stdout(None):
     import pygame
@@ -65,7 +67,7 @@ class Game:
         # start by connecting to the network
         client = Client()
         current_id = client.connect(name)
-        client.send("get")
+        client.send(GameStateDTO('get', None, None, None, None))
         foods, players, game_time = client.receive()
 
         # setup the clock, limit to 30fps
@@ -91,14 +93,17 @@ class Game:
                 str(player.playerScore) + " " + str(player.playerVelocity)
 
             # send data to client and recieve back all players information
-            client.send(data)
+            client.send(GameStateDTO('move', player.x, player.y,
+                                     player.playerScore, player.playerVelocity))
             foods, players, game_time = client.receive()
 
             # Exit the game if applicable
             self.exit()
 
-            # redraw window then update the frame
-            self.redraw_window(players, foods, game_time, player.playerScore)
+            # Refresh the window with new game state
+            self.refresh(players, foods, game_time, player.playerScore)
+
+            # Update the frame
             pygame.display.update()
 
         client.disconnect()
@@ -147,7 +152,7 @@ class Game:
         time = str(t)
         return time
 
-    def redraw_window(self, players, foods, game_time, score):
+    def refresh(self, players, foods, game_time, score):
         """
         draws each frame
         :return: None

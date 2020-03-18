@@ -1,6 +1,12 @@
 class GameStateDTO:
 
-    def __init__(self):
+    def __init__(self, command, x, y, score, velocity):
+        self.command = command
+        self.x = x
+        self.y = y
+        self.score = score
+        self.velocity = velocity
+
         self.players = []
         self.foods = []
         self.sentID = 0

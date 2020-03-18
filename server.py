@@ -7,6 +7,7 @@ import math
 from food import Food
 from player import Player
 from constants import colors
+from gameStateDTO import *
 
 players = {}
 foods = []
@@ -99,25 +100,20 @@ class Server:
                     start = False
             try:
                 # Recieve data from client
-                data = conn.recv(32)
+                data = conn.recv(1024)
 
                 if not data:
                     break
 
-                data = data.decode("utf-8")
                 # print("[DATA] Recieved", data, "from client id:", current_id)
 
                 # look for specific commands from recieved data
-                if data.split(" ")[0] == "move":
-                    split_data = data.split(" ")
-                    x = int(split_data[1])
-                    y = int(split_data[2])
-                    score = int(split_data[3])
-                    velocity = int(split_data[4])
-                    players[current_id].x = x
-                    players[current_id].y = y
-                    players[current_id].playerScore = int(score)
-                    players[current_id].playerVelocity = int(velocity)
+                gameState = pickle.loads(data)
+                if gameState.command == 'move':
+                    players[current_id].x = gameState.x
+                    players[current_id].y = gameState.y
+                    players[current_id].playerScore = gameState.score
+                    players[current_id].playerVelocity = gameState.velocity
 
                     #print(str(score) + " " + str(velocity))
 
@@ -136,11 +132,11 @@ class Server:
 
                     send_data = pickle.dumps((foods, players, game_time))
 
-                elif data.split(" ")[0] == "id":
+                elif gameState.command == 'id':
                     # if user requests id then send it
                     send_data = str.encode(str(current_id))
 
-                elif data.split(" ")[0] == "jump":
+                elif gameState.command == 'jump':
                     send_data = pickle.dumps((foods, players, game_time))
                 else:
                     # any other command just send back list of players
@@ -203,7 +199,7 @@ def make_foods(foods, n):
             return
         else:
             food = Food(x, y, random.choice(colors), food_id)
-            food_id+=1
+            food_id += 1
             foods.append(food)
     print(str(len(foods)) + " foods in game after")
 

@@ -1,5 +1,6 @@
 import socket
 import _pickle as pickle
+from gameStateDTO import *
 #import threading
 
 HOST = '127.0.0.1'
@@ -31,7 +32,7 @@ class Client:
         """
         self.sock.close()
 
-    def send(self, data, pick=False):
+    def send(self, GameState: GameStateDTO):
         """
         sends information to the server
 
@@ -39,18 +40,21 @@ class Client:
         :param pick: boolean if should pickle or not
         :return: str
         """
-        try:
-            if pick:
-                self.sock.send(pickle.dumps(data))
-            else:
-                self.sock.send(str.encode(data))
-        except socket.error as e:
-            print(e)
+        self.sock.sendall(pickle.dumps(GameState))
+
+        # try:
+        #     if pick:
+        #         self.sock.send(pickle.dumps(data))
+        #     else:
+        #         self.sock.send(str.encode(data))
+        # except socket.error as e:
+        #     print(e)
 
     def receive(self):
         reply = self.sock.recv(2048 * 4)
         try:
             reply = pickle.loads(reply)
+            print(reply)
         except Exception as e:
             print(e)
         return reply
