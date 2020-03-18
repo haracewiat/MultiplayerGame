@@ -1,13 +1,13 @@
 # small network game that has differnt blobs
 # moving around the screen
 
+import os
+import random
+from client import Client
 import contextlib
 
 with contextlib.redirect_stdout(None):
     import pygame
-from client import Network
-import random
-import os
 
 pygame.font.init()
 
@@ -25,7 +25,8 @@ TIME_FONT = pygame.font.SysFont("comicsans", 30)
 SCORE_FONT = pygame.font.SysFont("comicsans", 26)
 
 COLORS = [(255, 0, 0), (255, 128, 0), (255, 255, 0), (128, 255, 0), (0, 255, 0), (0, 255, 128), (0, 255, 255),
-          (0, 128, 255), (0, 0, 255), (0, 0, 255), (128, 0, 255), (255, 0, 255), (255, 0, 128), (128, 128, 128),
+          (0, 128, 255), (0, 0, 255), (0, 0, 255), (128, 0,
+                                                    255), (255, 0, 255), (255, 0, 128), (128, 128, 128),
           (0, 0, 0)]
 
 # Dynamic Variables
@@ -64,10 +65,12 @@ def redraw_window(players, foods, game_time, score):
         pygame.draw.circle(WIN, p.color, (p.x, p.y), PLAYER_RADIUS)
         # render and draw name for each player
         text = NAME_FONT.render(p.name, 1, (0, 0, 0))
-        WIN.blit(text, (p.x - text.get_width() / 2, p.y - text.get_height() / 2))
+        WIN.blit(text, (p.x - text.get_width() /
+                        2, p.y - text.get_height() / 2))
 
     # draw scoreboard
-    sort_players = list(reversed(sorted(players, key=lambda x: players[x].playerScore)))
+    sort_players = list(
+        reversed(sorted(players, key=lambda x: players[x].playerScore)))
     title = TIME_FONT.render("Scoreboard", 1, (0, 0, 0))
     start_y = 25
     x = W - title.get_width() - 10
@@ -75,7 +78,8 @@ def redraw_window(players, foods, game_time, score):
 
     ran = min(len(players), 3)
     for count, i in enumerate(sort_players[:ran]):
-        text = SCORE_FONT.render(str(count + 1) + ". " + str(players[i].name), 1, (0, 0, 0))
+        text = SCORE_FONT.render(
+            str(count + 1) + ". " + str(players[i].name), 1, (0, 0, 0))
         WIN.blit(text, (x, start_y + count * 20))
 
     # draw time
@@ -97,7 +101,7 @@ def main(name):
     global players
 
     # start by connecting to the network
-    server = Network()
+    server = Client()
     current_id = server.connect(name)
     foods, players, game_time = server.send("get")
 
@@ -136,7 +140,8 @@ def main(name):
         if keys[pygame.K_SPACE]:
             player.decreasePlayerScoreAndIncreaseVelocity()
         #print(str(player.playerScore)+" "+str(player.playerVelocity))
-        data = "move " + str(player.x) + " " + str(player.y) + " " +str(player.playerScore) + " " +str(player.playerVelocity)
+        data = "move " + str(player.x) + " " + str(player.y) + " " + \
+            str(player.playerScore) + " " + str(player.playerVelocity)
 
         # send data to server and recieve back all players information
         foods, players, game_time = server.send(data)
@@ -166,7 +171,8 @@ while True:
     if 0 < len(name) < 20:
         break
     else:
-        print("Error, this name is not allowed (must be between 1 and 19 characters [inclusive])")
+        print(
+            "Error, this name is not allowed (must be between 1 and 19 characters [inclusive])")
 
 # make window start in top left hand corner
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0, 30)

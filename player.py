@@ -9,12 +9,12 @@ class Player:
         self.color = color
         self.id = id
 
-    def increaseVelocity(self, newvelocity):
-        self.playerVelocity += newvelocity
+    def increaseVelocity(self, velocity):
+        self.playerVelocity += velocity
         return self.playerVelocity
 
-    def increasePlayerScore(self, newScore):
-        self.playerScore += newScore
+    def increasePlayerScore(self, score):
+        self.playerScore += score
         return self.playerScore
 
     def decreasePlayerScoreAndIncreaseVelocity(self):
