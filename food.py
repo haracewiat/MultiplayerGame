@@ -1,6 +1,7 @@
 class Food:
 
-    def __init__(self, x, y, color):
+    def __init__(self, x, y, colour, foodID):
         self.x = x
         self.y = y
-        self.color = color
+        self.colour = colour
+        self.foodID = foodID

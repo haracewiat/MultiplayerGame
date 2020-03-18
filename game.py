@@ -130,6 +130,7 @@ class Game:
                 player.y = player.y + vel
         if keys[pygame.K_SPACE]:
             player.decreasePlayerScoreAndIncreaseVelocity()
+            #player.printEatenFoodsList()
 
     def convert_time(self, t):
         """

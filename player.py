@@ -6,22 +6,23 @@ class Player:
         self.y = y
         self.playerVelocity = 18
         self.playerScore = 0
+        self.eatenFoods = []
         self.color = color
         self.id = id
 
-    def increaseVelocity(self, velocity):
-        self.playerVelocity += velocity
+    def increaseVelocity(self, newvelocity):
+        self.playerVelocity += newvelocity
         return self.playerVelocity
 
-    def increasePlayerScore(self, score):
-        self.playerScore += score
+    def increasePlayerScore(self, newScore):
+        self.playerScore += newScore
         return self.playerScore
 
     def decreasePlayerScoreAndIncreaseVelocity(self):
         self.playerScore = (int(self.playerScore-1))
-        print(self.playerScore)
+        #print(self.playerScore)
         self.playerVelocity = (int(self.playerVelocity+1))
-        print(self.playerVelocity)
+        #print(self.playerVelocity)
 
     def getVelocity(self):
         return self.playerVelocity
@@ -31,3 +32,14 @@ class Player:
 
     def getId(self):
         return self.id
+
+    def addFoodToEatenList(self, food):
+        self.eatenFoods.append(food)
+
+    def getEatenFoodsList(self):
+        return self.eatenFoods
+
+    def printEatenFoodsList(self):
+        print("start")
+        for food in self.eatenFoods:
+            print(food.foodID)

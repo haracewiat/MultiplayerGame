@@ -12,6 +12,7 @@ players = {}
 foods = []
 connections = 0
 _id = 0
+food_id = 0
 game_time = "Starting Soon"
 start = False
 start_time = 0
@@ -22,7 +23,6 @@ PORT = 5378
 BALL_RADIUS = 10
 START_RADIUS = 18
 ROUND_TIME = 600
-MASS_LOSS_TIME = 7
 W, H = 1200, 700
 
 
@@ -176,11 +176,13 @@ def check_collision(players, foods):
             dis = math.sqrt((x - bx) ** 2 + (y - by) ** 2)
             if dis <= START_RADIUS:
                 p.increasePlayerScore(1)
+                p.addFoodToEatenList(food)
                 foods.remove(food)
                 make_foods(foods, 1)
 
 
 def make_foods(foods, n):
+    global food_id
     if (len(foods) == (len(players) - 1)) and len(players) > 1:
         return
     print(str(n) + " foods to make")
@@ -200,7 +202,8 @@ def make_foods(foods, n):
         if (len(foods) == (len(players) - 1)) and len(players) > 1:
             return
         else:
-            food = Food(x, y, random.choice(colors))
+            food = Food(x, y, random.choice(colors), food_id)
+            food_id+=1
             foods.append(food)
     print(str(len(foods)) + " foods in game after")
 
