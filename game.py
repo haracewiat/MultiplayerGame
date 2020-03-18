@@ -109,6 +109,7 @@ def main(name):
         clock.tick(30)  # 30 fps max
         player = players[current_id]
         vel = START_VEL - round(player.increasePlayerScore(0))
+        #print("here "+str(vel))
         if vel <= 4:
             vel = 4
 
@@ -132,8 +133,10 @@ def main(name):
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             if player.y + vel + PLAYER_RADIUS <= H:
                 player.y = player.y + vel
-
-        data = "move " + str(player.x) + " " + str(player.y)
+        if keys[pygame.K_SPACE]:
+            player.decreasePlayerScoreAndIncreaseVelocity()
+        #print(str(player.playerScore)+" "+str(player.playerVelocity))
+        data = "move " + str(player.x) + " " + str(player.y) + " " +str(player.playerScore) + " " +str(player.playerVelocity)
 
         # send data to server and recieve back all players information
         foods, players, game_time = server.send(data)

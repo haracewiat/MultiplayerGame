@@ -16,22 +16,15 @@ from player import Player
 # setup sockets
 S = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 S.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
 # Set constants
 PORT = 5555
-
 BALL_RADIUS = 10
 START_RADIUS = 18
-
 ROUND_TIME = 600
-
 MASS_LOSS_TIME = 7
-
 W, H = 1200, 700
-
 HOST_NAME = socket.gethostname()
 SERVER_IP = "127.0.0.1"
-
 # try to connect to server
 try:
     S.bind((SERVER_IP, PORT))
@@ -39,11 +32,8 @@ except socket.error as e:
     print(str(e))
     print("[SERVER] Server could not start")
     quit()
-
 S.listen()  # listen for connections
-
 print(f"[SERVER] Server Started with local ip {SERVER_IP}")
-
 # dynamic variables
 players = {}
 foods = []
@@ -55,19 +45,8 @@ colors = [(255, 0, 0), (255, 128, 0), (255, 255, 0), (128, 255, 0), (0, 255, 0),
 start = False
 stat_time = 0
 game_time = "Starting Soon"
-
-
 # FUNCTIONS
-
 def check_collision(players, foods):
-    """
-    checks if any of the player have collided with any of the foods
-
-    :param players: a dictonary of players
-    :param foods: a list of foods
-    :return: None
-    """
-
     for player in players:
         p = players[player]
         x = p.x
@@ -79,15 +58,9 @@ def check_collision(players, foods):
             if dis <= START_RADIUS:
                 p.increasePlayerScore(1)
                 foods.remove(food)
+                make_foods(foods, 1)
 
 def make_foods(foods, n):
-    """
-    makes orbs/foods on the screen
-
-    :param foods: a list to add foods/orbs to
-    :param n: the amount of foods to make
-    :return: None
-    """
     if (len(foods) == (len(players) - 1)) and len(players)>1:
         return
     print(str(n)+ " foods to make")
@@ -104,18 +77,14 @@ def make_foods(foods, n):
                     stop = False
             if stop:
                 break
-        food = Food(x,y,random.choice(colors))
-        foods.append(food)
+        if (len(foods) == (len(players) - 1)) and len(players) > 1:
+            return
+        else:
+            food = Food(x,y,random.choice(colors))
+            foods.append(food)
     print(str(len(foods))+ " foods in game after")
 
 def get_start_location(players):
-    """
-    picks a start location for a player based on other player
-    locations. It wiill ensure it does not spawn inside another player
-
-    :param players: dict
-    :return: tuple (x,y)
-    """
     while True:
         stop = True
         x = random.randrange(0, W)
@@ -141,7 +110,7 @@ def threaded_client(conn, _id):
     # Setup properties for each new player
     color = colors[current_id]
     x, y = get_start_location(players)
-    player = Player(x,y,color,name)
+    player = Player(x,y,color,name, current_id)
     players[current_id] = player 
 
     # pickle data and send initial info to clients
@@ -178,8 +147,14 @@ def threaded_client(conn, _id):
                 split_data = data.split(" ")
                 x = int(split_data[1])
                 y = int(split_data[2])
+                score = int(split_data[3])
+                velocity = int(split_data[4])
                 players[current_id].x = x
                 players[current_id].y = y
+                players[current_id].playerScore = int(score)
+                players[current_id].playerVelocity = int(velocity)
+
+                #print(str(score) + " " + str(velocity))
 
                 # only check for collison if the game has started
                 if start:
@@ -188,8 +163,6 @@ def threaded_client(conn, _id):
 
                 #how many foods to make
                 #print("here "+str(len(players))+" "+str(len(foods)))
-                if len(players) == 1 and len(foods) == 0:
-                    make_foods(foods,1)
                 while len(foods) < len(players) - 1:
                     make_foods(foods, 1)
                     print("[GAME] Generating more orbs")
@@ -227,7 +200,7 @@ def threaded_client(conn, _id):
 # MAINLOOP
 
 # setup level with foods
-make_foods(foods, 1)
+#make_foods(foods, 1)
 
 print("[GAME] Setting up level")
 print("[SERVER] Waiting for connections")
@@ -248,6 +221,7 @@ while True:
 
     # increment connections start new thread then increment ids
     connections += 1
+    #make_foods(foods, 1)
     start_new_thread(threaded_client, (host, _id))
     _id += 1
 
