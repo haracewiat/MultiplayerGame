@@ -8,7 +8,7 @@ from client import Client
 import threading
 
 import contextlib
-from constants import colors as COLORS
+from constants import *
 from gameStateDTO import *
 import math
 
@@ -49,7 +49,7 @@ class Game:
                 break
             else:
                 print(
-                    "Error, this name is not allowed (must be between 1 and 19 characters [inclusive])")
+                    "Invalid name. Name must be between 1 and 19 characters inclusive.")
 
         # setup pygame window
         self.WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -63,7 +63,7 @@ class Game:
         # start by connecting to the network
         client = Client()
         current_id = client.connect(name)
-        client.send(GameStateDTO('get', None, None, None, None))
+        client.send(GameStateDTO('GET', None, None, None, None))
         foods, players, game_time = client.receive()
         player = players[current_id]
 
@@ -142,31 +142,19 @@ class Game:
         self.velocity = MIN_VELOCITY if velocity <= MIN_VELOCITY else velocity
 
     def convert_time(self, t):
-        """
-        converts a time given in seconds to a time in
-        minutes
-
-        :param t: int
-        :return: string
-        """
-        t = ROUND_TIME - t
-        time = str(t)
-        return time
+        time = ROUND_TIME - t
+        return str(time)
 
     def refresh(self, player, players, foods, game_time, score):
-        """
-        draws each frame
-        :return: None
-        """
-        self.WINDOW.fill(
-            (255, 255, 255))  # fill screen white, to clear old frames
+
+        self.WINDOW.fill(BACKGROUND)
 
         # draw me (client side prediction)
         pygame.draw.circle(self.WINDOW, player.color,
                            (player.x, player.y), PLAYER_RADIUS)
         text = NAME_FONT.render(player.name, 1, (0, 0, 0))
-        self.WINDOW.blit(text, (player.x - text.get_width() /
-                                2, player.y - text.get_height() / 2))
+        self.WINDOW.blit(text, (int(player.x - text.get_width() /
+                                    2), int(player.y - text.get_height() / 2)))
 
         # draw all the orbs/foods
         for food in foods:
@@ -175,9 +163,7 @@ class Game:
 
         # draw each player in the list except me
         for otherPlayer in sorted(players, key=lambda x: players[x].playerScore):
-            # print(player.id)
             p = players[otherPlayer]
-            print(p.id)
             if (player.id != p.id):
                 pygame.draw.circle(self.WINDOW, p.color,
                                    (p.x, p.y), PLAYER_RADIUS)

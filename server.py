@@ -9,7 +9,7 @@ import pygame
 
 from food import Food
 from player import Player
-from constants import colors
+from constants import *
 from gameStateDTO import *
 
 players = {}
@@ -80,7 +80,7 @@ class Server:
 
         # Setup properties for each new player
         #color = colors[current_id]
-        color = random.choice(colors)
+        color = random.choice(COLORS)
         x, y = get_start_location(players)
         player = Player(x, y, color, name, current_id)
         players[current_id] = player
@@ -197,7 +197,7 @@ def make_foods(foods, n):
         if (len(foods) == (len(players) - 1)) and len(players) > 1:
             return
         else:
-            food = Food(x, y, random.choice(colors), food_id)
+            food = Food(x, y, random.choice(COLORS), food_id)
             food_id += 1
             foods.append(food)
     print(str(len(foods)) + " foods in game after")
