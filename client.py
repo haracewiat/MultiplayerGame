@@ -1,15 +1,19 @@
 import socket
 import _pickle as pickle
 from gameStateDTO import *
-#import threading
+import threading
+from queue import LifoQueue
 
 HOST = '127.0.0.1'
 PORT = 5378
+
+queue = LifoQueue()
 
 
 class Client:
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    buffer = ()
 
     def __init__(self):
         self.addr = (HOST, PORT)
@@ -40,7 +44,9 @@ class Client:
         :param pick: boolean if should pickle or not
         :return: str
         """
-        self.sock.sendall(pickle.dumps(GameState))
+        print(GameState)
+        if(GameState):
+            self.sock.sendall(pickle.dumps(GameState))
 
         # try:
         #     if pick:
@@ -51,10 +57,19 @@ class Client:
         #     print(e)
 
     def receive(self):
-        reply = self.sock.recv(2048 * 4)
-        try:
-            reply = pickle.loads(reply)
-            print(reply)
-        except Exception as e:
-            print(e)
-        return reply
+        while True:
+            reply = self.sock.recv(2048 * 4)
+            if not reply:
+                break
+            try:
+                reply = pickle.loads(reply)
+                print(type(reply))
+                #print(reply)
+                queue.put(reply)
+            except Exception as e:
+                print(e)
+            return reply
+
+    def startClientReceivingThread(self):
+        t = threading.Thread(target=self.receive)
+        t.start()

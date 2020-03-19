@@ -4,6 +4,9 @@ import _pickle as pickle
 import time
 import random
 import math
+
+import pygame
+
 from food import Food
 from player import Player
 from constants import colors
@@ -91,7 +94,9 @@ class Server:
         get
         id - returns id of client
         '''
+        clock = pygame.time.Clock()
         while True:
+            clock.tick(10)
 
             if start:
                 game_time = round(time.time() - start_time)
