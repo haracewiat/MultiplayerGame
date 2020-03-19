@@ -8,13 +8,13 @@ HOST = '127.0.0.1'
 PORT = 5378
 BUFFER = 4096
 
-queue = LifoQueue()
-
 
 class Client:
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     buffer = ()
+    queue = LifoQueue()
+    watching = True
 
     def __init__(self):
         self.addr = (HOST, PORT)
@@ -31,31 +31,10 @@ class Client:
         return int(val.decode())  # can be int because will be an int id
 
     def disconnect(self):
-        """
-        disconnects from the server
-        :return: None
-        """
         self.sock.close()
 
     def send(self, GameState: GameStateDTO):
-        """
-        sends information to the server
-
-        :param data: str
-        :param pick: boolean if should pickle or not
-        :return: str
-        """
-        print(GameState)
-        if(GameState):
-            self.sock.sendall(pickle.dumps(GameState))
-
-        # try:
-        #     if pick:
-        #         self.sock.send(pickle.dumps(data))
-        #     else:
-        #         self.sock.send(str.encode(data))
-        # except socket.error as e:
-        #     print(e)
+        self.sock.sendall(pickle.dumps(GameState))
 
     def receive(self):
         while True:
@@ -64,13 +43,11 @@ class Client:
                 break
             try:
                 reply = pickle.loads(reply)
-                print(type(reply))
-                # print(reply)
-                queue.put(reply)
+                self.queue.put(reply)
             except Exception as e:
                 print(e)
             return reply
 
     def watchGameState(self):
-        thread_receive = threading.Thread(target=self.receive)
-        thread_receive.start()
+        while self.watching:
+            self.receive()

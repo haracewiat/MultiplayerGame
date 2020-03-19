@@ -4,7 +4,9 @@
 import os
 import random
 from client import Client
-from client import queue
+# from client import queue
+import threading
+
 import contextlib
 from constants import colors as COLORS
 from gameStateDTO import *
@@ -36,7 +38,7 @@ foods = []
 
 class Game:
 
-    run = True
+    running = True
     velocity = 0
 
     def __init__(self):
@@ -51,19 +53,11 @@ class Game:
 
         # setup pygame window
         self.WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption("Blobs")
 
         # start game
         self.run(name)
 
     def run(self, name):
-        """
-        function for running the game,
-        includes the main loop of the game
-
-        :param players: a list of dicts representing a player
-        :return: None
-        """
         global players
 
         # start by connecting to the network
@@ -73,15 +67,16 @@ class Game:
         foods, players, game_time = client.receive()
         player = players[current_id]
 
-        # setup the clock, limit to 30fps
+        # setup the clock
         clock = pygame.time.Clock()
 
-        while self.run:
+        # Watch the game state updates
+        thread_receive = threading.Thread(target=client.watchGameState)
+        thread_receive.start()
+
+        while self.running:
             # Set frames per second
             clock.tick(FPS)
-
-            # Watch the game state updates
-            client.watchGameState()
 
             # Adjust player's velocity
             self.setVelocity(player)
@@ -94,14 +89,14 @@ class Game:
                                      player.playerScore, player.playerVelocity))
 
             # Update the game state to the most recent one
-            if not queue.empty():
-                foods, players, game_time = queue.get(0)
+            if not client.queue.empty():
+                foods, players, game_time = client.queue.get(0)
 
             # See if player ate food
             check_collision(player, foods)
 
             # Exit the game if applicable
-            self.exit()
+            self.exit(client)
 
             # Refresh the window with new game state
             self.refresh(player, players, foods, game_time, player.playerScore)
@@ -109,6 +104,7 @@ class Game:
             # Update the frame
             pygame.display.update()
 
+        thread_receive.join()
         client.disconnect()
         pygame.quit()
         quit()
@@ -134,10 +130,12 @@ class Game:
             player.decreasePlayerScoreAndIncreaseVelocity()
             # player.printEatenFoodsList()
 
-    def exit(self):
+    def exit(self, client):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.run = False
+                self.running = False
+                client.watching = False
+                client.sock.shutdown(1)
 
     def setVelocity(self, player):
         velocity = (START_VEL - round(player.increasePlayerScore(0)))
