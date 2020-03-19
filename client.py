@@ -6,6 +6,7 @@ from queue import LifoQueue
 
 HOST = '127.0.0.1'
 PORT = 5378
+BUFFER = 4096
 
 queue = LifoQueue()
 
@@ -26,7 +27,7 @@ class Client:
         """
         self.sock.connect(self.addr)
         self.sock.send(str.encode(name))
-        val = self.sock.recv(8)
+        val = self.sock.recv(BUFFER)
         return int(val.decode())  # can be int because will be an int id
 
     def disconnect(self):
@@ -58,18 +59,18 @@ class Client:
 
     def receive(self):
         while True:
-            reply = self.sock.recv(2048 * 4)
+            reply = self.sock.recv(BUFFER)
             if not reply:
                 break
             try:
                 reply = pickle.loads(reply)
                 print(type(reply))
-                #print(reply)
+                # print(reply)
                 queue.put(reply)
             except Exception as e:
                 print(e)
             return reply
 
-    def startClientReceivingThread(self):
-        t = threading.Thread(target=self.receive)
-        t.start()
+    def watchGameState(self):
+        thread_receive = threading.Thread(target=self.receive)
+        thread_receive.start()

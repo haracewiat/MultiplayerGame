@@ -27,7 +27,9 @@ PORT = 5378
 BALL_RADIUS = 10
 START_RADIUS = 18
 ROUND_TIME = 600
-W, H = 1200, 700
+WIDTH, HEIGHT = 1200, 700
+BUFFER = 4096
+TICK_RATE = 10
 
 
 class Server:
@@ -72,12 +74,13 @@ class Server:
     def player_thread(self, conn, _id):
         global connections, players, foods, game_time, start
         current_id = _id
-        data = conn.recv(16)
+        data = conn.recv(BUFFER)
         name = data.decode("utf-8")
         print("[LOG]", name, "connected to the server.")
 
         # Setup properties for each new player
-        color = colors[current_id]
+        #color = colors[current_id]
+        color = random.choice(colors)
         x, y = get_start_location(players)
         player = Player(x, y, color, name, current_id)
         players[current_id] = player
@@ -85,18 +88,9 @@ class Server:
         # pickle data and send initial info to clients
         conn.send(str.encode(str(current_id)))
 
-        # server will recieve basic commands from client
-        # it will send back all of the other clients info
-        '''
-        commands start with:
-        move
-        jump
-        get
-        id - returns id of client
-        '''
         clock = pygame.time.Clock()
         while True:
-            clock.tick(10)
+            clock.tick(TICK_RATE)
 
             if start:
                 game_time = round(time.time() - start_time)
@@ -105,7 +99,7 @@ class Server:
                     start = False
             try:
                 # Recieve data from client
-                data = conn.recv(1024)
+                data = conn.recv(BUFFER)
 
                 if not data:
                     break
@@ -114,7 +108,7 @@ class Server:
 
                 # look for specific commands from recieved data
                 gameState = pickle.loads(data)
-                if gameState.command == 'move':
+                if gameState.command == 'MOVE':
                     players[current_id].x = gameState.x
                     players[current_id].y = gameState.y
                     players[current_id].playerScore = gameState.score
@@ -191,8 +185,8 @@ def make_foods(foods, n):
     for i in range(n):
         while True:
             stop = True
-            x = random.randrange(40, W-40)
-            y = random.randrange(40, H-40)
+            x = random.randrange(40, WIDTH-40)
+            y = random.randrange(40, HEIGHT-40)
             for player in players:
                 p = players[player]
                 dis = math.sqrt((x - p.x) ** 2 + (y - p.y) ** 2)
@@ -212,8 +206,8 @@ def make_foods(foods, n):
 def get_start_location(players):
     while True:
         stop = True
-        x = random.randrange(0, W)
-        y = random.randrange(0, H)
+        x = random.randrange(0, WIDTH)
+        y = random.randrange(0, HEIGHT)
         for player in players:
             p = players[player]
             dis = math.sqrt((x - p.x) ** 2 + (y - p.y) ** 2)

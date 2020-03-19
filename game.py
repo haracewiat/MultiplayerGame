@@ -75,12 +75,13 @@ class Game:
 
         # setup the clock, limit to 30fps
         clock = pygame.time.Clock()
-        #client.startClientReceivingThread()
 
         while self.run:
-            client.startClientReceivingThread()
             # Set frames per second
             clock.tick(FPS)
+
+            # Watch the game state updates
+            client.watchGameState()
 
             # Adjust player's velocity
             self.setVelocity(player)
@@ -88,18 +89,16 @@ class Game:
             # Move the player
             self.movePlayer(player, pygame.key.get_pressed(), self.velocity)
 
-            #print(str(player.playerScore)+" "+str(player.playerVelocity))
-            data = ""
-            data = "move " + str(player.x) + " " + str(player.y) + " " + \
-                str(player.playerScore) + " " + str(player.playerVelocity)
-
-            # send data to client and recieve back all players information
-            client.send(GameStateDTO('move', player.x, player.y,
+            # Sent the client's game state
+            client.send(GameStateDTO('MOVE', player.x, player.y,
                                      player.playerScore, player.playerVelocity))
-            #foods, players, game_time = client.receive()
+
+            # Update the game state to the most recent one
             if not queue.empty():
                 foods, players, game_time = queue.get(0)
-            check_collision(player,foods)
+
+            # See if player ate food
+            check_collision(player, foods)
 
             # Exit the game if applicable
             self.exit()
@@ -165,10 +164,11 @@ class Game:
             (255, 255, 255))  # fill screen white, to clear old frames
 
         # draw me (client side prediction)
-        pygame.draw.circle(self.WINDOW, player.color, (player.x, player.y), PLAYER_RADIUS)
+        pygame.draw.circle(self.WINDOW, player.color,
+                           (player.x, player.y), PLAYER_RADIUS)
         text = NAME_FONT.render(player.name, 1, (0, 0, 0))
         self.WINDOW.blit(text, (player.x - text.get_width() /
-                             2, player.y - text.get_height() / 2))
+                                2, player.y - text.get_height() / 2))
 
         # draw all the orbs/foods
         for food in foods:
@@ -181,11 +181,12 @@ class Game:
             p = players[otherPlayer]
             print(p.id)
             if (player.id != p.id):
-                pygame.draw.circle(self.WINDOW, p.color, (p.x, p.y), PLAYER_RADIUS)
+                pygame.draw.circle(self.WINDOW, p.color,
+                                   (p.x, p.y), PLAYER_RADIUS)
                 # render and draw name for each player
                 text = NAME_FONT.render(p.name, 1, (0, 0, 0))
                 self.WINDOW.blit(text, (p.x - text.get_width() /
-                                     2, p.y - text.get_height() / 2))
+                                        2, p.y - text.get_height() / 2))
 
         # draw scoreboard
         sort_players = list(
@@ -210,17 +211,17 @@ class Game:
         self.WINDOW.blit(text, (10, 15 + text.get_height()))
 
 
-
 def check_collision(player, foods):
-        x = player.x
-        y = player.y
-        for food in foods:
-            bx = food.x
-            by = food.y
-            dis = math.sqrt((x - bx) ** 2 + (y - by) ** 2)
-            if dis <= PLAYER_RADIUS:
-                player.increasePlayerScore(1)
-                player.addFoodToEatenList(food)
-                foods.remove(food)
+    x = player.x
+    y = player.y
+    for food in foods:
+        bx = food.x
+        by = food.y
+        dis = math.sqrt((x - bx) ** 2 + (y - by) ** 2)
+        if dis <= PLAYER_RADIUS:
+            player.increasePlayerScore(1)
+            player.addFoodToEatenList(food)
+            foods.remove(food)
+
 
 game = Game()
